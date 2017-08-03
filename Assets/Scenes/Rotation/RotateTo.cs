@@ -1,59 +1,34 @@
-﻿using UnityEngine;
-using System.Collections;
-//---------------------------------------------------
-public class RotateTo : MonoBehaviour 
-{
-	//---------------------------------------------------
-	//Reference to target object
-	public Transform Target = null;
+﻿using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
 
-	//Rotation speed
-	public float RotSpeed = 30f;
+public class RotateTo : MonoBehaviour {
 
-	//Damped Speed
-	public float Damping = 10f;
-	//---------------------------------------------------
-	// Update is called once per frame
-	void Update () 
-	{
-		RotateTowardsWithDamp();
-	}
-	//---------------------------------------------------
-	//Call this function in update to directly and continually look at a target position
-	void LookAtImmediate()
-	{
-		transform.rotation = Quaternion.LookRotation(Target.position-transform.position,Vector3.up);
-	}
-	//---------------------------------------------------
-	void RotateTowards()
-	{
-		//Get look to rotation
-		Quaternion DestRot = Quaternion.LookRotation(Target.position-transform.position,Vector3.up);
+    private Transform thisTransform = null;
+    public float rotSpeed = 90f;
+    public Transform target;
 
-		//Update rotation
-		transform.rotation = Quaternion.RotateTowards(transform.rotation, DestRot, RotSpeed * Time.deltaTime);
-	}
-	//---------------------------------------------------
-	void RotateTowardsWithDamp()
-	{
-		//Get look to rotation
-		Quaternion DestRot = Quaternion.LookRotation(Target.position-transform.position,Vector3.up);
+    private void Awake()
+    {
+        thisTransform = GetComponent<Transform>();
+    }
 
-		//Calc smooth rotate
-		Quaternion smoothRot = Quaternion.Slerp(transform.rotation, DestRot, 1f - (Time.deltaTime*Damping));
+    private void Update()
+    {
+        // Uses degrees to rotate around axis
+        //thisTransform.rotation = Quaternion.Euler(0f, 90f, 0f);
 
-		//Update Rotation
-		transform.rotation = smoothRot;
-	}
-	//---------------------------------------------------
-	//Spin object about axis
-	void SpinObject(Vector3 AxisRot)
-	{
-		//Update rotation
-		transform.rotation *= Quaternion.Euler(RotSpeed*Time.deltaTime*AxisRot.x,
-												RotSpeed*Time.deltaTime*AxisRot.y,
-												RotSpeed*Time.deltaTime*AxisRot.z);
-	}
-	//---------------------------------------------------
+        // Rotates object by rotSpeed around Y axis in global space
+        // Quaternion.AngleAxis(rotSpeed * Time.deltaTime, Vector3.up);
+
+        // Take existing rotation and add angleaxis to it
+        //thisTransform.rotation *= Quaternion.AngleAxis(rotSpeed * Time.deltaTime, Vector3.up);
+
+        //target.position - thisTransform.position gives us a difference between them
+        //thisTransform.rotation = Quaternion.LookRotation(target.position - thisTransform.position, Vector3.up);
+
+        Quaternion destRot = Quaternion.LookRotation(target.position - thisTransform.position, Vector3.up);
+        thisTransform.rotation = Quaternion.RotateTowards(thisTransform.rotation, destRot, rotSpeed * Time.deltaTime);
+    }
+
 }
-//---------------------------------------------------
